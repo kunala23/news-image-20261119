@@ -16,7 +16,13 @@ def main():
     here = os.path.dirname(os.path.abspath(__file__))
     src = os.path.join(here, "entry.png")
     os.makedirs(out_dir, exist_ok=True)
-    shutil.copyfile(src, os.path.join(out_dir, "entry.png"))
+    dst = os.path.join(out_dir, "entry.png")
+    shutil.copyfile(src, dst)
+    # Guard the gate: the output must be a whole PNG, not a truncated copy.
+    with open(dst, "rb") as fh:
+        head = fh.read(8)
+    if head != b"\x89PNG\r\n\x1a\n":
+        raise SystemExit("entry.png is not a PNG file")
 
 
 if __name__ == "__main__":
